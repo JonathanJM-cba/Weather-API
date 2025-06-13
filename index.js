@@ -11,6 +11,8 @@ app.get("/", (req, res) => {
   res.send("Bienvenido a la API para consultar el tiempo");
 });
 
+app.use("/api/v1", require("./routes"));
+
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en localhost:${PORT}`);
 });
