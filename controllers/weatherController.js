@@ -7,6 +7,8 @@ const getWeatherLocation = async (req, res) => {
     const weatherLocation = await getWeatherOfLocation(location);
     res.status(200).json(weatherLocation);
   } catch (error) {
+    if (error.message === "ERROR_LOCATION_NOT_FOUND")
+      return handleHttpError(res, "ERROR_LOCATION_NOT_FOUND", 404);
     handleHttpError(res, "ERROR_GET_WEATHER_OF_LOCATION");
   }
 };

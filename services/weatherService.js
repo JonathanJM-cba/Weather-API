@@ -14,6 +14,15 @@ const getWeatherOfLocation = async (location) => {
     );
     return res.data;
   } catch (error) {
+    if (
+      error.response &&
+      error.response.data.includes("Invalid location") &&
+      error.response.status === 400
+    ) {
+      const customError = new Error("ERROR_LOCATION_NOT_FOUND");
+      throw customError;
+    }
+    console.log("Datos del error: ", error);
     console.log("Error al intentar obtener el clima del la locación");
     throw new Error("ERROR_GET_WEATHER_OF_LOCATION");
   }

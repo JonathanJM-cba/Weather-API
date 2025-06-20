@@ -6,7 +6,7 @@
  * @returns - Retorna la respuesta al cliente
  */
 const handleHttpError = (res, message = "ERROR_HTTP", code = 400) => {
-  return res.send(message).status(code);
+  return res.status(code).send({ error: message });
 };
 
 module.exports = handleHttpError;
