@@ -38,7 +38,7 @@ const getWeatherOfLocationByDateRange = async (
     );
     return res.data;
   } catch (error) {
-    console.log("Error ocurrido: ", error);
+    console.log("Error ocurrido: ", error.response);
     let customError = "";
     if (
       error.response &&
@@ -52,7 +52,12 @@ const getWeatherOfLocationByDateRange = async (
         customError = new Error("ERROR_EXCEEDS_MAXIMUM_QUERY_COST");
         throw customError;
       } else {
-        throw new Error("ERROR_GET_WEATHER_OF_LOCATION_BY_DATE_RANGE");
+        if (error.response && error.response.status === 429) {
+          customError = new Error("ERROR_EXCEEDED_MAXIMUN_NUMBER_DAILY_RESULT");
+          throw customError;
+        } else {
+          throw new Error("ERROR_GET_WEATHER_OF_LOCATION_BY_DATE_RANGE");
+        }
       }
     }
     //OBSERVAR EL ERROR 429 de muchas peticiones en el dia
