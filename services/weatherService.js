@@ -22,10 +22,34 @@ const getWeatherOfLocation = async (location) => {
       const customError = new Error("ERROR_LOCATION_NOT_FOUND");
       throw customError;
     }
-    console.log("Datos del error: ", error);
     console.log("Error al intentar obtener el clima del la locación");
     throw new Error("ERROR_GET_WEATHER_OF_LOCATION");
   }
 };
 
-module.exports = { getWeatherOfLocation };
+const getWeatherOfLocationByDateRange = async (
+  location,
+  startDate,
+  endDate
+) => {
+  try {
+    const res = await axios.get(
+      `${URL_BASE}${location}/${startDate}/${endDate}?key=${API_WEATHER_KEY}`
+    );
+    return res.data;
+  } catch (error) {
+    if (
+      error.response &&
+      error.response.data.includes("Invalid location") &&
+      error.response.status === 400
+    ) {
+      const customError = new Error("ERROR_LOCATION_NOT_FOUND");
+      throw customError;
+    }
+    //OBSERVAR EL ERROR 429 de muchas peticiones en el dia
+    //You have exceeded the maximum number of daily result records for your account.
+    throw new Error("ERROR_GET_WEATHER_OF_LOCATION_BY_DATE_RANGE");
+  }
+};
+
+module.exports = { getWeatherOfLocation, getWeatherOfLocationByDateRange };
