@@ -38,30 +38,26 @@ const getWeatherOfLocationByDateRange = async (
     );
     return res.data;
   } catch (error) {
-    console.log("Error ocurrido: ", error.response);
-    let customError = "";
-    if (
-      error.response &&
-      error.response.data.includes("Invalid location") &&
-      error.response.status === 400
-    ) {
-      customError = new Error("ERROR_LOCATION_NOT_FOUND");
-      throw customError;
-    } else {
-      if (error.response && error.response.status === 401) {
-        customError = new Error("ERROR_EXCEEDS_MAXIMUM_QUERY_COST");
-        throw customError;
-      } else {
-        if (error.response && error.response.status === 429) {
-          customError = new Error("ERROR_EXCEEDED_MAXIMUN_NUMBER_DAILY_RESULT");
-          throw customError;
-        } else {
-          throw new Error("ERROR_GET_WEATHER_OF_LOCATION_BY_DATE_RANGE");
-        }
-      }
+    const status = error.response?.status;
+    const data = error.response?.data;
+
+    console.log("Error ocurrido:", status, data);
+
+    switch (true) {
+      case status === 400 &&
+        typeof data === "string" &&
+        data.includes("Invalid location"):
+        throw new Error("ERROR_LOCATION_NOT_FOUND");
+
+      case status === 401:
+        throw new Error("ERROR_EXCEEDS_MAXIMUM_QUERY_COST");
+
+      case status === 429:
+        throw new Error("ERROR_EXCEEDED_MAXIMUN_NUMBER_DAILY_RESULT");
+
+      default:
+        throw new Error("ERROR_GET_WEATHER_OF_LOCATION_BY_DATE_RANGE");
     }
-    //OBSERVAR EL ERROR 429 de muchas peticiones en el dia
-    //You have exceeded the maximum number of daily result records for your account.
   }
 };
 
