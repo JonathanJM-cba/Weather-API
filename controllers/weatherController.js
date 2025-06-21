@@ -39,10 +39,8 @@ const getWeatherLocationByDateRange = async (req, res) => {
   } catch (error) {
     if (error.message === "ERROR_LOCATION_NOT_FOUND")
       return handleHttpError(res, "ERROR_LOCATION_NOT_FOUND", 404);
-    console.log(
-      "Error al obtener los datos del tiempo de la locación por rango de fecha: ",
-      error
-    );
+    if (error.message === "ERROR_EXCEEDS_MAXIMUM_QUERY_COST")
+      return handleHttpError(res, "ERROR_EXCEEDS_MAXIMUM_QUERY_COST", 401);
     handleHttpError(res, "ERROR_GET_WEATHER_OF_LOCATION_BY_DATE_RANGE", 500);
   }
 };
