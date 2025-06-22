@@ -1,4 +1,5 @@
 const axios = require("axios");
+const redisClient = require("../config/redisClient");
 require("dotenv").config();
 
 const URL_BASE =
@@ -6,12 +7,30 @@ const URL_BASE =
 
 const API_WEATHER_KEY = process.env.API_KEY;
 
+// TTL (tiempo de expiración en segundos): 12 horas
+const CACHE_EXPIRATION = 60 * 60 * 12; // 43200
+
 const getWeatherOfLocation = async (location) => {
   try {
-    //const res = await ax `${URL_BASE}${location}?key=${API_WEATHER_KEY}`
+    //Se verifica si existe el clima de la localidad almacenada en la cache
+    const weatherCached = await redisClient.get(location.toLowerCase());
+
+    if (weatherCached) {
+      console.log("Clima de la locación devuelta desde la cache");
+      return JSON.parse(weatherCached);
+    }
+
+    //Si no existe se almacena en la cache
     const res = await axios.get(
       `${URL_BASE}${location}?key=${API_WEATHER_KEY}`
     );
+
+    await redisClient.setEx(
+      location.toLowerCase(),
+      CACHE_EXPIRATION,
+      JSON.stringify(res.data)
+    );
+
     return res.data;
   } catch (error) {
     if (
